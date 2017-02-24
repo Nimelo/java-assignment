@@ -40,8 +40,8 @@ public class MainPanel {
 
         frame.pack();
         frame.setVisible(true);
-        int width = (int)(0.75 * screenSize.getWidth());
-        int height = (int)(0.75 * screenSize.getHeight());
+        int width = (int)(0.7 * screenSize.getWidth());
+        int height = (int)(0.7 * screenSize.getHeight());
         frame.setSize(new Dimension(width, height));
     }
 
