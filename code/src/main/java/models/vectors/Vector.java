@@ -122,4 +122,21 @@ public class Vector {
     public double[] getData() {
         return data;
     }
+
+    /**
+     * Transforms vector to string object.
+     *
+     * @return Vector interpretation in String format.
+     */
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (int j = 0; j < size; j++) {
+            stringBuilder.append(String.format("%f ", data[j]));
+        }
+        stringBuilder.append("\n");
+
+        return stringBuilder.toString();
+    }
 }

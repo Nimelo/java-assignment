@@ -4,6 +4,7 @@ import models.exceptions.NonSquareMatrixException;
 import models.exceptions.ZeroPivotException;
 import models.matrices.Matrix;
 import models.utilities.objects.LUMatrixTuple;
+import models.utilities.objects.PivotingResult;
 import models.vectors.Vector;
 
 /**
@@ -27,10 +28,11 @@ public class LUMatricesUtilities {
      * @throws NonSquareMatrixException when given Matrix has no square shape
      * @throws ZeroPivotException       when zero will occur on the pivot
      */
-    public static Matrix reorder(final Matrix a) throws NonSquareMatrixException, ZeroPivotException {
+    public static PivotingResult reorder(final Matrix a) throws NonSquareMatrixException, ZeroPivotException {
         if (!a.isSquare())
             throw new NonSquareMatrixException();
         // Note: pivoting information is stored in temperary vector pvt
+        int numberOfExchanges = 0;
         int n = a.getRows();
         int pvtk, pvti;
         double aet, tmp, mult;
@@ -65,6 +67,7 @@ public class LUMatricesUtilities {
                 int ii = pvt[k];
                 pvt[k] = pvt[pc];
                 pvt[pc] = ii;
+                numberOfExchanges++;
             }
 
             // now eliminate the column entries logically below mx[pvt[k]][k]
@@ -84,7 +87,7 @@ public class LUMatricesUtilities {
         for (int i = 0; i < n; i++)
             p.getData()[i][pvt[i]] = 1.0;
 
-        return p;
+        return new PivotingResult(p, numberOfExchanges);
     }
 
     /**
@@ -110,12 +113,12 @@ public class LUMatricesUtilities {
         // LU decomposition without pivoting
         for (int k = 0; k < n - 1; k++) {
             for (int i = k + 1; i < n; i++) {
-                if (Math.abs(temp.getData()[k][k]) < 1.e-07) throw new ZeroPivotException();
+                if (Math.abs(temp.getData()[k][k]) < ZERO_LIMIT_BOUNDARY) throw new ZeroPivotException();
                 mult = temp.getData()[i][k] / temp.getData()[k][k];
                 temp.getData()[i][k] = mult;                      // entries of L are saved in temp
                 for (int j = k + 1; j < n; j++) {
                     temp.getData()[i][j] -= mult * temp.getData()[k][j];      // entries of U are saved in temp
-                    if (Math.abs(temp.getData()[i][i]) < 1.e-07) throw new ZeroPivotException();
+                    if (Math.abs(temp.getData()[i][i]) < ZERO_LIMIT_BOUNDARY) throw new ZeroPivotException();
                 }
             }
         }
@@ -141,18 +144,18 @@ public class LUMatricesUtilities {
      * @return Solved vector x.
      */
     public static Vector solve(final Matrix l, final Matrix u, final Vector b) {
-        int n = l.getRows();
+        int n = b.getSize();
         Vector x = new Vector(b);
 
+        // forward substitution for L y = b.
         for (int i = 1; i < n; i++)
             for (int j = 0; j < i; j++)
-                x.setAt(i, x.getAt(i) - l.getAt(i, j) * x.getAt(j));
+                x.getData()[i] -= l.getData()[i][j]*x.getData()[j];
 
+        // back substitution for U x = y.
         for (int i = n - 1; i >= 0; i--) {
-            for (int j = i + 1; j < n; j++) {
-                x.setAt(i, x.getAt(i) - u.getAt(i, j) * x.getAt(j));
-            }
-            x.setAt(i, x.getAt(i) / u.getAt(i, i));
+            for (int j = i + 1; j < n; j++) x.getData()[i] -= u.getData()[i][j]*x.getData()[j];
+            x.getData()[i] /= u.getData()[i][i];
         }
 
         return x;

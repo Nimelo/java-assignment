@@ -24,7 +24,7 @@ public class InverseMatrixUtilities {
      * @throws InvalidMatrixSizeForMultiplication when matrix sizes are not correct during multiplication
      */
     public static Matrix findInverse(final Matrix a) throws NonSquareMatrixException, ZeroPivotException, InvalidMatrixSizeForMultiplication {
-        Matrix p = LUMatricesUtilities.reorder(a);
+        Matrix p = LUMatricesUtilities.reorder(a).getMatrix();
         LUMatrixTuple luTuple = LUMatricesUtilities.factorize(p.multiply(a));
 
         Matrix inverseL = findInverseOfLowerTriangularMatrix(luTuple.getL());

@@ -1,9 +1,10 @@
 package models.matrices;
 
-import com.sun.javaws.exceptions.InvalidArgumentException;
 import models.exceptions.InvalidMatrixSizeForMultiplication;
 import models.exceptions.MatrixVectorMultiplicationSizeException;
 import models.vectors.Vector;
+
+import java.util.Arrays;
 
 /**
  * A matrix class for data storage od a 2D array of doubles.
@@ -217,5 +218,23 @@ public final class Matrix {
                 res.getData()[i] += this.getData()[i][j] * vector.getData()[j];
 
         return res;
+    }
+
+    /**
+     * Transforms matrix to string object.
+     *
+     * @return Matrix interpretation in String format.
+     */
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                stringBuilder.append(String.format("%f ", data[i][j]));
+            }
+            stringBuilder.append("\n");
+        }
+
+        return stringBuilder.toString();
     }
 }

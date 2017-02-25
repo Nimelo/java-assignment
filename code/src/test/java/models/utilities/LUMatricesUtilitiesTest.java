@@ -17,28 +17,13 @@ import static org.junit.jupiter.api.Assertions.*;
  * Created by Mateusz Gasior on 24-Feb-17.
  */
 class LUMatricesUtilitiesTest {
-    @BeforeEach
-    void setUp() {
-
-    }
-
-    @AfterEach
-    void tearDown() {
-
-    }
-
-    @Test
-    void reorder() {
-
-    }
-
     @Test
     void pivotFactorization() throws NonSquareMatrixException, ZeroPivotException, InvalidMatrixSizeForMultiplication {
         final int n = 4;
         double[][] data = {{1, 4, 2, 3}, {1, 2, 1, 0}, {2, 6, 3, 1}, {0, 0, 1, 4}};
         Matrix input = new Matrix(data);
 
-        Matrix reorder = LUMatricesUtilities.reorder(input);
+        Matrix reorder = LUMatricesUtilities.reorder(input).getMatrix();
         LUMatrixTuple factorize = LUMatricesUtilities.factorize(reorder.multiply(input));
 
         double[][] correctL = {{1, 0, 0, 0}, {1, 1, 0, 0}, {0, 0, 1, 0}, {2, 1, 0, 1}};
@@ -103,7 +88,7 @@ class LUMatricesUtilitiesTest {
         double[] vectorData = {1, 2, 3, 4};
         Vector vector = new Vector(vectorData);
 
-        Matrix reorder = LUMatricesUtilities.reorder(input);
+        Matrix reorder = LUMatricesUtilities.reorder(input).getMatrix();
         LUMatrixTuple factorize = LUMatricesUtilities.factorize(reorder.multiply(input));
         Vector solution = LUMatricesUtilities.solve(factorize.getL(), factorize.getU(), reorder.multiply(vector));
 
@@ -122,7 +107,7 @@ class LUMatricesUtilitiesTest {
         double[] vectorData = {-1, 2, 3};
         Vector vector = new Vector(vectorData);
 
-        Matrix reorder = LUMatricesUtilities.reorder(input);
+        Matrix reorder = LUMatricesUtilities.reorder(input).getMatrix();
         LUMatrixTuple factorize = LUMatricesUtilities.factorize(reorder.multiply(input));
         Vector solution = LUMatricesUtilities.solve(factorize.getL(), factorize.getU(), reorder.multiply(vector));
 
@@ -141,11 +126,30 @@ class LUMatricesUtilitiesTest {
         double[] vectorData = {1, 2, 3};
         Vector vector = new Vector(vectorData);
 
-        Matrix reorder = LUMatricesUtilities.reorder(input);
+        Matrix reorder = LUMatricesUtilities.reorder(input).getMatrix();
         LUMatrixTuple factorize = LUMatricesUtilities.factorize(reorder.multiply(input));
         Vector solution = LUMatricesUtilities.solve(factorize.getL(), factorize.getU(), reorder.multiply(vector));
 
         double[] correctSolution = {-0.375, 1.25, 1};
+
+        for (int i = 0; i < correctSolution.length; i++) {
+            assertEquals(correctSolution[i], solution.getData()[i], 0.01);
+        }
+    }
+
+    @Test
+    void solveSetD() throws NonSquareMatrixException, ZeroPivotException, InvalidMatrixSizeForMultiplication, MatrixVectorMultiplicationSizeException {
+        double[][] data = {{1, 2, 3}, {4, 5, 6}, {7, 8, 2}};
+        Matrix input = new Matrix(data);
+
+        double[] vectorData = {1, 1, 1};
+        Vector vector = new Vector(vectorData);
+
+        Matrix reorder = LUMatricesUtilities.reorder(input).getMatrix();
+        LUMatrixTuple factorize = LUMatricesUtilities.factorize(reorder.multiply(input));
+        Vector solution = LUMatricesUtilities.solve(factorize.getL(), factorize.getU(), reorder.multiply(vector));
+
+        double[] correctSolution = {6, 15, 17};
 
         for (int i = 0; i < correctSolution.length; i++) {
             assertEquals(correctSolution[i], solution.getData()[i], 0.01);
