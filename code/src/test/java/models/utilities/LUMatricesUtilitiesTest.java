@@ -136,23 +136,4 @@ class LUMatricesUtilitiesTest {
             assertEquals(correctSolution[i], solution.getData()[i], 0.01);
         }
     }
-
-    @Test
-    void solveSetD() throws NonSquareMatrixException, ZeroPivotException, InvalidMatrixSizeForMultiplication, MatrixVectorMultiplicationSizeException {
-        double[][] data = {{1, 2, 3}, {4, 5, 6}, {7, 8, 2}};
-        Matrix input = new Matrix(data);
-
-        double[] vectorData = {1, 1, 1};
-        Vector vector = new Vector(vectorData);
-
-        Matrix reorder = LUMatricesUtilities.reorder(input).getMatrix();
-        LUMatrixTuple factorize = LUMatricesUtilities.factorize(reorder.multiply(input));
-        Vector solution = LUMatricesUtilities.solve(factorize.getL(), factorize.getU(), reorder.multiply(vector));
-
-        double[] correctSolution = {6, 15, 17};
-
-        for (int i = 0; i < correctSolution.length; i++) {
-            assertEquals(correctSolution[i], solution.getData()[i], 0.01);
-        }
-    }
 }
