@@ -13,43 +13,65 @@ import models.vectors.Vector;
  */
 public class InverseMatrixUtilities {
 
+    /**
+     * Determines Inverse Matrix using partial pivoting LU decomposition.
+     * If exception is thrown inverse matrix does not exist.
+     *
+     * @param a Matrix for which inverse matrix should be determined
+     * @return Inversion matrix
+     * @throws NonSquareMatrixException           when provided matrix is not square shaped
+     * @throws ZeroPivotException                 when zero occurs on a pivot during LU decomposition
+     * @throws InvalidMatrixSizeForMultiplication when matrix sizes are not correct during multiplication
+     */
     public static Matrix findInverse(final Matrix a) throws NonSquareMatrixException, ZeroPivotException, InvalidMatrixSizeForMultiplication {
         Matrix p = LUMatricesUtilities.reorder(a);
         LUMatrixTuple luTuple = LUMatricesUtilities.factorize(p.multiply(a));
 
-        Matrix inverseL = findInverseL(luTuple.getL());
-        Matrix inverseU = findInverseU(luTuple.getU());
+        Matrix inverseL = findInverseOfLowerTriangularMatrix(luTuple.getL());
+        Matrix inverseU = findInverseOfUpperTriangularMatrix(luTuple.getU());
 
         return inverseU.multiply(inverseL).multiply(p);
     }
 
-    private static Matrix findInverseU(Matrix u) {
+    /**
+     * Determines Inverse Matrix for upper triangular matrix.
+     *
+     * @param u Upper triangular matrix.
+     * @return Inversion matrix
+     */
+    public static Matrix findInverseOfUpperTriangularMatrix(Matrix u) {
         int n = u.getRows();
         Matrix inverse = new Matrix(n, n);
 
-        for (int k = 1; k < n; k++) {
+        for (int k = 0; k < n; k++) {
             Vector e = new Vector(n);
             e.setAt(k, 1);
 
             for (int i = 0; i < n; i++)
                 inverse.setAt(k, i, e.getAt(i));
 
-            for (int i = n - 1; i >= 0; i++) {
+            for (int i = n - 1; i >= 0; i--) {
                 for (int j = i + 1; j < n; j++) {
-                    inverse.setAt(k, i, u.getAt(k, i) - u.getAt(i, j) * inverse.getAt(k, j));
+                    inverse.getData()[k][i] -= u.getData()[i][j] * inverse.getData()[k][j];
                 }
-                inverse.setAt(k, i, inverse.getAt(k, i) / u.getAt(i, i));
+                inverse.getData()[k][i] /= u.getData()[i][i];
             }
         }
 
         return inverse.transpose();
     }
 
-    private static Matrix findInverseL(Matrix l) {
+    /**
+     * Determines Inverse Matrix for lower triangular matrix.
+     *
+     * @param l Lower triangular matrix.
+     * @return Inversion matrix.
+     */
+    public static Matrix findInverseOfLowerTriangularMatrix(Matrix l) {
         int n = l.getRows();
         Matrix inverse = new Matrix(n, n);
 
-        for (int k = 1; k < n; k++) {
+        for (int k = 0; k < n; k++) {
             Vector e = new Vector(n);
             e.setAt(k, 1);
 
@@ -58,7 +80,7 @@ public class InverseMatrixUtilities {
 
             for (int i = 1; i < n; i++) {
                 for (int j = 0; j < i; j++) {
-                    inverse.setAt(k, i, inverse.getAt(k, i) - l.getAt(i, j) * inverse.getAt(k, j));
+                    inverse.getData()[k][i] -= l.getData()[i][j] * inverse.getData()[k][j];
                 }
             }
         }
