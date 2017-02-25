@@ -1,10 +1,12 @@
 package models.utilities;
 
 import models.exceptions.InvalidMatrixSizeForMultiplication;
+import models.exceptions.MatrixVectorMultiplicationSizeException;
 import models.exceptions.NonSquareMatrixException;
 import models.exceptions.ZeroPivotException;
 import models.matrices.Matrix;
 import models.utilities.objects.LUMatrixTuple;
+import models.vectors.Vector;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,18 +33,16 @@ class LUMatricesUtilitiesTest {
     }
 
     @Test
-    void factorize() throws NonSquareMatrixException, ZeroPivotException, InvalidMatrixSizeForMultiplication {
+    void pivotFactorization() throws NonSquareMatrixException, ZeroPivotException, InvalidMatrixSizeForMultiplication {
         final int n = 4;
-        Matrix input = new Matrix(n, n);
-        double[][] inputs = {{1, 2, 1, 3}, {2, 3, 1, 4}, {1, 4, 3, 2}, {2, 4, 1, 5}};
-        for (int i = 0; i < n; i++)
-            for (int j = 0; j < n; j++)
-                input.setAt(i, j, inputs[i][j]);
+        double[][] data = {{1, 4, 2, 3}, {1, 2, 1, 0}, {2, 6, 3, 1}, {0, 0, 1, 4}};
+        Matrix input = new Matrix(data);
 
-        LUMatrixTuple factorize = LUMatricesUtilities.factorize(input);
+        Matrix reorder = LUMatricesUtilities.reorder(input);
+        LUMatrixTuple factorize = LUMatricesUtilities.factorize(reorder.multiply(input));
 
-        double[][] correctL = {{-1, 2, 0, -1}, {-1, -0.5, 0.2, 1.0}, {1, 0.4, 0.2, -1}, {1, -0.4, -0.2, 0}};
-        double[][] correctU = {{2, 3, 1, 4}, {0, 2.5, 2.5, 0}, {0, 0, -1, 1}, {0, 0, 0, 1}};
+        double[][] correctL = {{1, 0, 0, 0}, {1, 1, 0, 0}, {0, 0, 1, 0}, {2, 1, 0, 1}};
+        double[][] correctU = {{1, 2, 1, 0}, {0, 2, 1, 3}, {0, 0, 1, 4}, {0, 0, 0, -2}};
 
         for (int i = 0; i < n; i++)
             for (int j = 0; j < n; j++)
@@ -54,31 +54,101 @@ class LUMatricesUtilitiesTest {
     }
 
     @Test
-    void factorize2() throws NonSquareMatrixException, ZeroPivotException, InvalidMatrixSizeForMultiplication {
+    void factorizationSetA() throws NonSquareMatrixException, ZeroPivotException, InvalidMatrixSizeForMultiplication {
         final int n = 3;
-        Matrix input = new Matrix(n, n);
-        double[][] inputs = {{1, 3, 5}, {2, 4, 7}, {1, 1, 0}};
-        for (int i = 0; i < n; i++)
-            for (int j = 0; j < n; j++)
-                input.setAt(i, j, inputs[i][j]);
+
+        double[][] data = {{5, -2, 3}, {-3, 9, 1}, {2, -1, -7}};
+        Matrix input = new Matrix(data);
 
         LUMatrixTuple factorize = LUMatricesUtilities.factorize(input);
 
-        double[][] correctL = {{1, 0, 0}, {0.5, 1, 0}, {0.5, -1, 1}};
-        double[][] correctU = {{2, 4, 7}, {0, 1, 1.5}, {0, 0, -2}};
+        double[][] correctL = {{1, 0, 0}, {-0.6, 1, 0}, {0.4, -0.025641, 1}};
+        double[][] correctU = {{5, -2, 3}, {0, 7.8, 2.8}, {0, 0, -8.12821}};
 
         for (int i = 0; i < n; i++)
             for (int j = 0; j < n; j++)
-                assertEquals(correctL[i][j], factorize.getL().getAt(i, j));
+                assertEquals(correctL[i][j], factorize.getL().getAt(i, j), 1e-2);
 
         for (int i = 0; i < n; i++)
             for (int j = 0; j < n; j++)
-                assertEquals(correctU[i][j], factorize.getU().getAt(i, j));
+                assertEquals(correctU[i][j], factorize.getU().getAt(i, j), 1e-2);
     }
 
     @Test
-    void solve() {
+    void factorizationSetB() throws NonSquareMatrixException, ZeroPivotException, InvalidMatrixSizeForMultiplication {
+        final int n = 3;
 
+        double[][] data = {{2, -1, 3}, {4, 2, 1}, {-6, -1, 2}};
+        Matrix input = new Matrix(data);
+
+        LUMatrixTuple factorize = LUMatricesUtilities.factorize(input);
+
+        double[][] correctL = {{1, 0, 0}, {2, 1, 0}, {-3, -1, 1}};
+        double[][] correctU = {{2, -1, 3}, {0, 4, -5}, {0, 0, 6}};
+
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                assertEquals(correctL[i][j], factorize.getL().getAt(i, j), 1e-2);
+
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                assertEquals(correctU[i][j], factorize.getU().getAt(i, j), 1e-2);
     }
 
+    @Test
+    void solveSetA() throws NonSquareMatrixException, ZeroPivotException, InvalidMatrixSizeForMultiplication, MatrixVectorMultiplicationSizeException {
+        double[][] matrix = {{1, 4, 2, 3}, {1, 2, 1, 0}, {2, 6, 3, 1}, {0, 0, 1, 4}};
+        Matrix input = new Matrix(matrix);
+
+        double[] vectorData = {1, 2, 3, 4};
+        Vector vector = new Vector(vectorData);
+
+        Matrix reorder = LUMatricesUtilities.reorder(input);
+        LUMatrixTuple factorize = LUMatricesUtilities.factorize(reorder.multiply(input));
+        Vector solution = LUMatricesUtilities.solve(factorize.getL(), factorize.getU(), reorder.multiply(vector));
+
+        double[] correctSolution = {3, -2.5, 4, 0};
+
+        for (int i = 0; i < correctSolution.length; i++) {
+            assertEquals(correctSolution[i], solution.getData()[i], 0.01);
+        }
+    }
+
+    @Test
+    void solveSetB() throws NonSquareMatrixException, ZeroPivotException, InvalidMatrixSizeForMultiplication, MatrixVectorMultiplicationSizeException {
+        double[][] data = {{5, -2, 3}, {-3, 9, 1}, {2, -1, -7}};
+        Matrix input = new Matrix(data);
+
+        double[] vectorData = {-1, 2, 3};
+        Vector vector = new Vector(vectorData);
+
+        Matrix reorder = LUMatricesUtilities.reorder(input);
+        LUMatrixTuple factorize = LUMatricesUtilities.factorize(reorder.multiply(input));
+        Vector solution = LUMatricesUtilities.solve(factorize.getL(), factorize.getU(), reorder.multiply(vector));
+
+        double[] correctSolution = {0.186, 0.331, -0.423};
+
+        for (int i = 0; i < correctSolution.length; i++) {
+            assertEquals(correctSolution[i], solution.getData()[i], 0.01);
+        }
+    }
+
+    @Test
+    void solveSetC() throws NonSquareMatrixException, ZeroPivotException, InvalidMatrixSizeForMultiplication, MatrixVectorMultiplicationSizeException {
+        double[][] data = {{2, -1, 3}, {4, 2, 1}, {-6, -1, 2}};
+        Matrix input = new Matrix(data);
+
+        double[] vectorData = {1, 2, 3};
+        Vector vector = new Vector(vectorData);
+
+        Matrix reorder = LUMatricesUtilities.reorder(input);
+        LUMatrixTuple factorize = LUMatricesUtilities.factorize(reorder.multiply(input));
+        Vector solution = LUMatricesUtilities.solve(factorize.getL(), factorize.getU(), reorder.multiply(vector));
+
+        double[] correctSolution = {-0.375, 1.25, 1};
+
+        for (int i = 0; i < correctSolution.length; i++) {
+            assertEquals(correctSolution[i], solution.getData()[i], 0.01);
+        }
+    }
 }

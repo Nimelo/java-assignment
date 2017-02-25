@@ -2,6 +2,8 @@ package models.matrices;
 
 import com.sun.javaws.exceptions.InvalidArgumentException;
 import models.exceptions.InvalidMatrixSizeForMultiplication;
+import models.exceptions.MatrixVectorMultiplicationSizeException;
+import models.vectors.Vector;
 
 /**
  * A matrix class for data storage od a 2D array of doubles.
@@ -31,14 +33,30 @@ public final class Matrix {
      *
      * @param rows    Number of rows in matrix.
      * @param columns Number of columns in matrix.
-     * @throws InvalidArgumentException when rows or columns is negative.
+     * @throws Exception when rows or columns is negative.
      */
-    public Matrix(int rows, int columns) {//throws InvalidArgumentException {
-//        if (rows < 0 || columns < 0)
-//            throw new InvalidArgumentException(new String[]{String.valueOf(rows), String.valueOf(columns)});
+    public Matrix(int rows, int columns) {
         this.rows = rows;
         this.columns = columns;
         this.data = new double[rows][columns];
+    }
+
+    /**
+     * Parametrized constructor.
+     * Sets the rows and columns in matrix.
+     * Allocates the data 2D array for given 2D array.
+     *
+     * @param data 2D array used to set elements
+     */
+    public Matrix(double[][] data) {
+        this.rows = data.length;
+        this.columns = data[0].length;
+        this.data = new double[rows][columns];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                this.data[i][j] = data[i][j];
+            }
+        }
     }
 
     /**
@@ -146,6 +164,7 @@ public final class Matrix {
 
     /**
      * Calculates determinant of the matrix
+     *
      * @return Determinant of matrix
      */
     public double determinant() throws Exception {
@@ -154,6 +173,7 @@ public final class Matrix {
 
     /**
      * Transposing matrix routine
+     *
      * @return
      */
     public Matrix transpose() {
@@ -165,5 +185,37 @@ public final class Matrix {
         }
 
         return transpose;
+    }
+
+    /**
+     * Returns data matrix
+     *
+     * @return elements of matrix
+     */
+    public double[][] getData() {
+        return data;
+    }
+
+    /**
+     * Multiplies Matrix by a Vector.
+     *
+     * @param vector Right hand-side vector
+     * @return Product of Matrix-Vector multiplication - Vector
+     * @throws MatrixVectorMultiplicationSizeException when size of the vector is not equal to number of columns in a matrix
+     */
+    public Vector multiply(Vector vector) throws MatrixVectorMultiplicationSizeException {
+        int nRows = getRows();
+        int nCols = getColumns();
+
+        if (nCols != vector.getSize())
+            throw new MatrixVectorMultiplicationSizeException();
+
+        Vector res = new Vector(nRows);
+
+        for (int i = 0; i < nRows; i++)
+            for (int j = 0; j < nCols; j++)
+                res.getData()[i] += this.getData()[i][j] * vector.getData()[j];
+
+        return res;
     }
 }

@@ -30,57 +30,59 @@ public class LUMatricesUtilities {
     public static Matrix reorder(final Matrix a) throws NonSquareMatrixException, ZeroPivotException {
         if (!a.isSquare())
             throw new NonSquareMatrixException();
-        Matrix p = new Matrix(a.getRows(), a.getColumns());
-        int pvtk, pvti, n = a.getRows();
+        // Note: pivoting information is stored in temperary vector pvt
+        int n = a.getRows();
+        int pvtk, pvti;
         double aet, tmp, mult;
+
         int[] pvt = new int[n];
         Matrix temp = new Matrix(a);
 
-        for (int k = 0; k < n; k++)
-            pvt[k] = k;
+        for (int k = 0; k < n; k++) pvt[k] = k;
 
-        Vector scale = new Vector(n);
+        Vector scale = new Vector(n);             // find scale vector
         for (int k = 0; k < n; k++) {
-            scale.setAt(k, 0);
+            scale.getData()[k] = 0;
             for (int j = 0; j < n; j++)
-                if (Math.abs(scale.getAt(k)) < Math.abs(temp.getAt(k, j)))
-                    scale.setAt(k, Math.abs(temp.getAt(k, j)));
+                if (Math.abs(scale.getData()[k]) < Math.abs(temp.getData()[k][j]))
+                    scale.getData()[k] = Math.abs(temp.getData()[k][j]);
         }
 
-        for (int k = 0; k < n - 1; k++) {
+        for (int k = 0; k < n - 1; k++) {            // main elimination loop
+
+            // find the pivot in column k in rows pvt[k], pvt[k+1], ..., pvt[n-1]
             int pc = k;
-            aet = Math.abs(temp.getAt(pvt[k], k) / scale.getAt(k));
+            aet = Math.abs(temp.getData()[pvt[k]][k] / scale.getData()[k]);
             for (int i = k + 1; i < n; i++) {
-                tmp = Math.abs(temp.getAt(pvt[i], k) / scale.getAt(pvt[i]));
+                tmp = Math.abs(temp.getData()[pvt[i]][k] / scale.getData()[pvt[i]]);
                 if (tmp > aet) {
                     aet = tmp;
                     pc = i;
                 }
             }
-            if (Math.abs(aet) < ZERO_LIMIT_BOUNDARY)
-                throw new ZeroPivotException();
-            if (pc != k) {
+            if (Math.abs(aet) < ZERO_LIMIT_BOUNDARY) throw new ZeroPivotException();
+            if (pc != k) {                      // swap pvt[k] and pvt[pc]
                 int ii = pvt[k];
                 pvt[k] = pvt[pc];
                 pvt[pc] = ii;
             }
 
-            pvtk = pvt[k];
+            // now eliminate the column entries logically below mx[pvt[k]][k]
+            pvtk = pvt[k];                           // pivot row
             for (int i = k + 1; i < n; i++) {
                 pvti = pvt[i];
-                if (temp.getAt(pvti, k) != 0) {
-                    mult = temp.getAt(pvti, k) / temp.getAt(pvtk, k);
-                    temp.setAt(pvti, k, mult);
-                    for (int j = k + 1; j < n; j++) {
-                        temp.setAt(pvti, j, temp.getAt(pvti, j) - mult * temp.getAt(pvtk, j));
-                    }
+                if (temp.getData()[pvti][k] != 0) {
+                    mult = temp.getData()[pvti][k] / temp.getData()[pvtk][k];
+                    temp.getData()[pvti][k] = mult;
+                    for (int j = k + 1; j < n; j++)
+                        temp.getData()[pvti][j] -= mult * temp.getData()[pvtk][j];
                 }
             }
         }
 
-        for (int i = 0; i < n; i++) {
-            p.setAt(i, pvt[i], 1.0);
-        }
+        Matrix p = new Matrix(n, n);
+        for (int i = 0; i < n; i++)
+            p.getData()[i][pvt[i]] = 1.0;
 
         return p;
     }
@@ -100,33 +102,31 @@ public class LUMatricesUtilities {
 
         int n = a.getRows();
         double mult;
+
         Matrix temp = new Matrix(a);
         Matrix l = new Matrix(n, n);
         Matrix u = new Matrix(n, n);
 
+        // LU decomposition without pivoting
         for (int k = 0; k < n - 1; k++) {
             for (int i = k + 1; i < n; i++) {
-                if (Math.abs(temp.getAt(k, k)) < ZERO_LIMIT_BOUNDARY)
-                    throw new ZeroPivotException();
-                mult = temp.getAt(i, k) / temp.getAt(k, k);
-                temp.setAt(i, k, mult);
+                if (Math.abs(temp.getData()[k][k]) < 1.e-07) throw new ZeroPivotException();
+                mult = temp.getData()[i][k] / temp.getData()[k][k];
+                temp.getData()[i][k] = mult;                      // entries of L are saved in temp
                 for (int j = k + 1; j < n; j++) {
-                    temp.setAt(i, j, temp.getAt(i, j) - mult * temp.getAt(k, j));
-                    if (Math.abs(temp.getAt(i, i)) < ZERO_LIMIT_BOUNDARY)
-                        throw new ZeroPivotException();
+                    temp.getData()[i][j] -= mult * temp.getData()[k][j];      // entries of U are saved in temp
+                    if (Math.abs(temp.getData()[i][i]) < 1.e-07) throw new ZeroPivotException();
                 }
             }
         }
 
-        for (int i = 0; i < n; i++)
-            l.setAt(i, i, 1.0);
+        // create l and u from temp
+        for (int i = 0; i < n; i++) l.getData()[i][i] = 1.0;
         for (int i = 1; i < n; i++)
-            for (int j = 0; j < i; j++)
-                l.setAt(i, j, temp.getAt(i, j));
+            for (int j = 0; j < i; j++) l.getData()[i][j] = temp.getData()[i][j];
 
         for (int i = 0; i < n; i++)
-            for (int j = i; j < n; j++)
-                u.setAt(i, j, temp.getAt(i, j));
+            for (int j = i; j < n; j++) u.getData()[i][j] = temp.getData()[i][j];
 
         return new LUMatrixTuple(l, u);
     }
@@ -157,4 +157,5 @@ public class LUMatricesUtilities {
 
         return x;
     }
+
 }

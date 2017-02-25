@@ -45,6 +45,20 @@ public class Vector {
     }
 
     /**
+     * Parametrized constructor.
+     * Copies all elements from given array of elements.
+     *
+     * @param vectorData Array of elements for Vector.
+     */
+    public Vector(double[] vectorData) {
+        this.size = vectorData.length;
+        this.data = new double[size];
+        for (int i = 0; i < size; i++) {
+            this.data[i] = vectorData[i];
+        }
+    }
+
+    /**
      * Returns the size of the Vector.
      *
      * @return Size of the Vector.
@@ -98,5 +112,14 @@ public class Vector {
             }
         }
         return false;
+    }
+
+    /**
+     * Return vector array of elements
+     *
+     * @return Elements of vector
+     */
+    public double[] getData() {
+        return data;
     }
 }
