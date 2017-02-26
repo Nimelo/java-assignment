@@ -130,10 +130,13 @@ public class MainPanel {
             if (s != null) {
                 try {
                     Result deserialize = controller.deserialize(s);
-                    this.outputArea.setText(deserialize.toString());
-                    this.matrixArea.setText(deserialize.getOriginalMatrix().toString());
-                    if (deserialize instanceof LUPivotResult) {
-                        this.vectorArea.setText(((LUPivotResult) deserialize).getOriginalVector().toString());
+                    if(deserialize != null)
+                    {
+                        this.outputArea.setText(deserialize.toString());
+                        this.matrixArea.setText(deserialize.getOriginalMatrix().toString());
+                        if (deserialize instanceof LUPivotResult) {
+                            this.vectorArea.setText(((LUPivotResult) deserialize).getOriginalVector().toString());
+                        }
                     }
                 } catch (IOException e1) {
                     JOptionPane.showMessageDialog(mainPanel, "File not found", "Error with file", JOptionPane.OK_OPTION);
