@@ -1,29 +1,35 @@
 package controllers;
 
-import controllers.exceptions.InversionConstraintsException;
-import controllers.exceptions.LUPivotConstraintsException;
-import controllers.exceptions.NotEqualAmountOfColumnsInMatrixException;
-import controllers.results.InverseResult;
-import controllers.results.LUPivotResult;
+import controllers.exceptions.*;
+import models.internals.results.InverseResult;
+import models.internals.results.LUPivotResult;
+import models.internals.ApplicationModel;
 import models.exceptions.*;
+import models.internals.results.Result;
 import models.matrices.Matrix;
-import models.utilities.LUDecomposition;
 import models.vectors.Vector;
+
+import java.io.IOException;
 
 /**
  * Controller of Application.
  * Created by Mateusz Gasior on 25-Feb-17.
  */
 public class MainController {
-    /**
-     * Matrix A.
-     */
-    private Matrix matrix;
 
     /**
-     * Vector b.
+     * Model of application (matrix and vector).
      */
-    private Vector vector;
+    private final ApplicationModel model;
+
+    /**
+     * Default parametrized constructor.
+     *
+     * @param model Model of application.
+     */
+    public MainController(ApplicationModel model) {
+        this.model = model;
+    }
 
     /**
      * Routine that calculates solution of problem Ax = b
@@ -35,39 +41,7 @@ public class MainController {
      * @throws SingularMatrixException     when matrix is singular.
      */
     public LUPivotResult LUPivot() throws NonSquareMatrixException, InvalidMatrixSizesException, LUPivotConstraintsException, SingularMatrixException {
-        checkLUPivotConstraints();
-
-        LUDecomposition factorize = new LUDecomposition(matrix);
-        Vector solution = factorize.solve(vector);
-        double determinant = factorize.det();
-
-        return new LUPivotResult(matrix, vector, factorize.getL(), factorize.getU(), solution, determinant);
-    }
-
-    /**
-     * Checks if inverse routine can be performed.
-     *
-     * @throws InversionConstraintsException when routine cannot be performed.
-     */
-    private void checkInverseConstraints() throws InversionConstraintsException {
-        if (matrix == null || !matrix.isSquare()) {
-            throw new InversionConstraintsException();
-        }
-    }
-
-    /**
-     * Checks if LU Pivoting routine can be performed.
-     *
-     * @throws LUPivotConstraintsException when routine cannot be performed.
-     */
-    private void checkLUPivotConstraints() throws LUPivotConstraintsException {
-        if (matrix == null || vector == null) {
-            throw new LUPivotConstraintsException();
-        } else {
-            if (vector.getSize() != matrix.getColumns()) {
-                throw new LUPivotConstraintsException();
-            }
-        }
+        return model.LUPivot();
     }
 
     /**
@@ -77,26 +51,7 @@ public class MainController {
      * @throws InversionConstraintsException when requirements for inverse routine does not meet desired requirements.
      */
     public InverseResult inverse() throws InversionConstraintsException {
-        checkInverseConstraints();
-        Matrix inverse = null;
-        double determinant = 0.0;
-        Matrix l = null;
-        Matrix u = null;
-
-        try {
-            LUDecomposition luDecomposition = new LUDecomposition(matrix);
-
-            l = luDecomposition.getL();
-            u = luDecomposition.getU();
-
-            inverse = luDecomposition.inverse();
-
-            determinant = luDecomposition.det();
-        } catch (Throwable e) {
-
-        } finally {
-            return new InverseResult(matrix, l, u, inverse, determinant);
-        }
+        return this.model.inverse();
     }
 
     /**
@@ -106,8 +61,9 @@ public class MainController {
      *
      * @param matrix Matrix in a string format.
      * @throws NotEqualAmountOfColumnsInMatrixException when number of columns is different for rows.
+     * @throws MatrixExtractionException                when elements are not real numbers.
      */
-    public void extractAndSetMatrix(String matrix) throws NotEqualAmountOfColumnsInMatrixException {
+    public void extractAndSetMatrix(String matrix) throws NotEqualAmountOfColumnsInMatrixException, MatrixExtractionException {
         final String rowsSeparator = "\n";
         final String columnSeparator = " ";
 
@@ -121,11 +77,17 @@ public class MainController {
             }
 
             for (int j = 0; j < columns.length; j++) {
-                data[i][j] = Double.valueOf(columns[j]);
+                try {
+                    data[i][j] = Double.valueOf(columns[j]);
+                } catch (Throwable t) {
+                    throw new MatrixExtractionException();
+                }
+
             }
         }
 
-        this.matrix = new Matrix(data);
+        Matrix newMatrix = new Matrix(data);
+        this.model.setMatrix(newMatrix);
     }
 
     /**
@@ -133,17 +95,31 @@ public class MainController {
      * Value separator is single space.
      *
      * @param vector Vector in a string format.
+     * @throws VectorExtractionException when elements of vector are not real numbers.
      */
-    public void extractAndSetVector(String vector) {
+    public void extractAndSetVector(String vector) throws VectorExtractionException {
         final String valuesSeparator = " ";
 
         String[] values = vector.split(valuesSeparator);
 
         double[] data = new double[values.length];
         for (int i = 0; i < values.length; i++) {
-            data[i] = Double.valueOf(values[i]);
+            try {
+                data[i] = Double.valueOf(values[i]);
+            } catch (Throwable throwable) {
+                throw new VectorExtractionException();
+            }
+
         }
 
-        this.vector = new Vector(data);
+        this.model.setVector(new Vector(data));
+    }
+
+    public void serialize(String path) throws IOException {
+        this.model.serializeLastResult(path);
+    }
+
+    public Result deserialize(String path) throws IOException, ClassNotFoundException {
+        return this.model.deserializeResult(path);
     }
 }

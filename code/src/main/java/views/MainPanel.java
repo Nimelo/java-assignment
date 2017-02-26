@@ -1,15 +1,17 @@
 package views;
 
 import controllers.MainController;
-import controllers.exceptions.InversionConstraintsException;
-import controllers.exceptions.NotEqualAmountOfColumnsInMatrixException;
-import controllers.results.InverseResult;
-import controllers.results.LUPivotResult;
+import controllers.exceptions.*;
+import models.exceptions.*;
+import models.internals.results.InverseResult;
+import models.internals.results.LUPivotResult;
+import models.internals.ApplicationModel;
+import models.internals.results.Result;
+import views.dialogs.DialogRoutine;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.io.IOException;
 
 /**
  * Created by Mateusz Gasior on 23-Feb-17.
@@ -75,30 +77,77 @@ public class MainPanel {
      * Wires up all necessary action listeners.
      */
     public MainPanel() {
-        controller = new MainController();
+        controller = new MainController(new ApplicationModel());
 
         inverseButton.addActionListener(e -> {
             try {
+                this.statusLabel.setText("Everything is alright!");
                 controller.extractAndSetMatrix(matrixArea.getText());
                 InverseResult inverse = controller.inverse();
-                this.outputArea.setText(inverse.toString());
-            } catch (NotEqualAmountOfColumnsInMatrixException e1) {
-                this.statusLabel.setText("NotEqualAmountOfColumnsInMatrixException");
+                this.outputArea.setText(String.format("%s%s\n", this.outputArea.getText(), inverse.toString()));
             } catch (InversionConstraintsException e1) {
-                this.statusLabel.setText("InversionConstraintsException");
+                this.statusLabel.setText("Error: Input matrix is not correct!");
+            } catch (NotEqualAmountOfColumnsInMatrixException e1) {
+                this.statusLabel.setText("Error: Input matrix is not correct. Check number of columns.");
+            } catch (MatrixExtractionException e1) {
+                this.statusLabel.setText("Error: Matrix values are incorrect.");
+            } catch (Throwable t) {
+                this.statusLabel.setText("Error: unhandled throwable!");
             }
         });
 
         LUPivotButton.addActionListener(e -> {
             try {
+                this.statusLabel.setText("Everything is alright!");
                 controller.extractAndSetMatrix(matrixArea.getText());
                 controller.extractAndSetVector(vectorArea.getText());
                 LUPivotResult luPivotResult = controller.LUPivot();
-                this.outputArea.setText(luPivotResult.toString());
+                this.outputArea.setText(String.format("%s%s\n", this.outputArea.getText(), luPivotResult.toString()));
+            } catch (NonSquareMatrixException e1) {
+                this.statusLabel.setText("Error: Matrix is not square.");
             } catch (NotEqualAmountOfColumnsInMatrixException e1) {
-                this.statusLabel.setText("NotEqualAmountOfColumnsInMatrixException");
-            } catch (Throwable throwable) {
-                this.statusLabel.setText(throwable.getClass().getName());
+                this.statusLabel.setText("Error: Input matrix is not correct. Check number of columns.");
+            } catch (LUPivotConstraintsException e1) {
+                this.statusLabel.setText("Error: Input vector or matrix is not correct.");
+            } catch (SingularMatrixException e1) {
+                this.statusLabel.setText("Error: Input matrix is singular.");
+            } catch (InvalidMatrixSizesException e1) {
+                this.statusLabel.setText("Error: Error during multiplication of matrices.");
+            } catch (VectorExtractionException e1) {
+                this.statusLabel.setText("Error: Vector values are incorrect.");
+            } catch (MatrixExtractionException e1) {
+                this.statusLabel.setText("Error: Matrix values are incorrect.");
+            } catch (Throwable t) {
+                this.statusLabel.setText("Error: unhandled throwable!");
+            }
+        });
+
+        loadButton.addActionListener(e -> {
+            String s = DialogRoutine.openDialog();
+            if (s != null) {
+                try {
+                    Result deserialize = controller.deserialize(s);
+                    this.outputArea.setText(deserialize.toString());
+                    this.matrixArea.setText(deserialize.getOriginalMatrix().toString());
+                    if (deserialize instanceof LUPivotResult) {
+                        this.vectorArea.setText(((LUPivotResult) deserialize).getOriginalVector().toString());
+                    }
+                } catch (IOException e1) {
+                    JOptionPane.showMessageDialog(mainPanel, "File not found", "Error with file", JOptionPane.OK_OPTION);
+                } catch (ClassNotFoundException e1) {
+                    JOptionPane.showMessageDialog(mainPanel, "Invalid version of file.", "Error with file", JOptionPane.OK_OPTION);
+                }
+            }
+        });
+
+        saveButton.addActionListener(e -> {
+            String s = DialogRoutine.saveDialog();
+            if (s != null) {
+                try {
+                    controller.serialize(s);
+                } catch (IOException e1) {
+                    JOptionPane.showMessageDialog(mainPanel, "Could not save file.", "Error with file", JOptionPane.OK_OPTION);
+                }
             }
         });
 

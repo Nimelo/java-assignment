@@ -6,10 +6,14 @@ import models.exceptions.SingularMatrixException;
 import models.matrices.Matrix;
 import models.vectors.Vector;
 
+import java.io.Serializable;
+
 /**
+ * Performs LU decomposition of m by n matrix.
+ * If isNonsingular() returns false then all linear solver will fail.
  * Created by Mateusz Gasior on 26-Feb-17.
  */
-public class LUDecomposition {
+public class LUDecomposition implements Serializable {
 
     /**
      * Array for internal storage of decomposition.

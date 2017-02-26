@@ -2,12 +2,14 @@ package models.matrices;
 
 import models.vectors.Vector;
 
+import java.io.Serializable;
+
 /**
  * A matrix class for data storage od a 2D array of doubles.
  * Implementation uses 2D array of doubles.
  * Created by Mateusz Gasior on 24-Feb-17.
  */
-public final class Matrix {
+public final class Matrix implements Serializable {
     /**
      * Elements of matrix.
      */
@@ -210,5 +212,30 @@ public final class Matrix {
             }
         }
         return A;
+    }
+
+    /**
+     * Overridden equals method. Checks if all the elements in matrix are equal.
+     *
+     * @param obj Object to compare.
+     * @return True if object is Matrix and elements are the same. Otherwise false.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof Matrix)) {
+            return false;
+        } else {
+            Matrix other = (Matrix) obj;
+
+            if (rows != other.getRows()
+                    || columns != other.getColumns())
+                return false;
+
+            for (int i = 0; i < rows; i++)
+                for (int j = 0; j < columns; j++)
+                    if (data[i][j] != other.data[i][j])
+                        return false;
+        }
+        return true;
     }
 }
