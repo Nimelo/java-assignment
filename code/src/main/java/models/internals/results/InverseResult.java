@@ -6,6 +6,9 @@ import models.utilities.LUDecomposition;
 /**
  * Result of inversion routine invoked from the controller.
  * Created by Mateusz Gasior on 25-Feb-17.
+ *
+ * @author Mateusz Gasior
+ * @see Result
  */
 public class InverseResult extends Result {
     /**

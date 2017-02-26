@@ -2,13 +2,14 @@ package models.internals.results;
 
 import models.matrices.Matrix;
 import models.utilities.LUDecomposition;
-import models.vectors.Vector;
 
 import java.io.Serializable;
 
 /**
  * Common result of computation routines.
  * Created by Mateusz Gasior on 26-Feb-17.
+ *
+ * @author Mateusz Gasior
  */
 public class Result implements Serializable {
     /**

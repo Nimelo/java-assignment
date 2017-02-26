@@ -8,6 +8,8 @@ import java.io.Serializable;
  * A matrix class for data storage od a 2D array of doubles.
  * Implementation uses 2D array of doubles.
  * Created by Mateusz Gasior on 24-Feb-17.
+ *
+ * @author Mateusz Gasior
  */
 public final class Matrix implements Serializable {
     /**
@@ -32,7 +34,6 @@ public final class Matrix implements Serializable {
      *
      * @param rows    Number of rows in matrix.
      * @param columns Number of columns in matrix.
-     * @throws Exception when rows or columns is negative.
      */
     public Matrix(int rows, int columns) {
         this.rows = rows;

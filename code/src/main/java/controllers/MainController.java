@@ -1,22 +1,23 @@
 package controllers;
 
-import controllers.exceptions.*;
+import controllers.exceptions.MatrixExtractionException;
+import controllers.exceptions.NotEqualAmountOfColumnsInMatrixException;
+import controllers.exceptions.VectorExtractionException;
 import controllers.transformers.TransformationUtils;
+import models.exceptions.*;
+import models.internals.ApplicationModel;
 import models.internals.results.InverseResult;
 import models.internals.results.LUPivotResult;
-import models.internals.ApplicationModel;
-import models.exceptions.*;
 import models.internals.results.Result;
-import models.matrices.Matrix;
-import models.vectors.Vector;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 /**
  * Controller of Application.
  * Created by Mateusz Gasior on 25-Feb-17.
+ *
+ * @author Mateusz Gasior
+ * @see ApplicationModel
  */
 public class MainController {
 
@@ -81,10 +82,24 @@ public class MainController {
         this.model.setVector(TransformationUtils.transformToVector(vector));
     }
 
+    /**
+     * Serializes output of last operation to the file.
+     *
+     * @param path Path to the file location.
+     * @throws IOException when error occurs while saving.
+     */
     public void serialize(String path) throws IOException {
         this.model.serializeLastResult(path);
     }
 
+    /**
+     * Deserializes last operation from the file.
+     *
+     * @param path Path to the file.
+     * @return Deserialized object.
+     * @throws IOException            when error occurs while reading the file.
+     * @throws ClassNotFoundException while deserializing the object from file.
+     */
     public Result deserialize(String path) throws IOException, ClassNotFoundException {
         return this.model.deserializeResult(path);
     }

@@ -6,8 +6,10 @@ import java.io.Serializable;
  * A Vector class for data storage of a 1D array of doubles.
  * Implementation uses array of doubles to store data.
  * Created by Mateusz Gasior on 24-Feb-17.
+ *
+ * @author Mateusz Gasior
  */
-public class Vector implements Serializable{
+public class Vector implements Serializable {
     /**
      * Internal array of stored data.
      */

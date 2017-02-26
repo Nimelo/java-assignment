@@ -7,6 +7,9 @@ import models.vectors.Vector;
 /**
  * Result of LUPivot routine invoked from controller.
  * Created by Mateusz Gasior on 25-Feb-17.
+ *
+ * @author Mateusz Gasior
+ * @see Result
  */
 public class LUPivotResult extends Result {
     /**
@@ -36,6 +39,7 @@ public class LUPivotResult extends Result {
 
     /**
      * Returns original vector.
+     *
      * @return Original vector.
      */
     public Vector getOriginalVector() {

@@ -7,6 +7,9 @@ import java.io.File;
 /**
  * Provides features to select the path of the files (save/open).
  * Created by Mateusz Gasior on 26-Feb-17.
+ *
+ * @author Mateusz Gasior
+ * @see JFileChooser
  */
 public class DialogRoutine {
 

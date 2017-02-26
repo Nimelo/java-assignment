@@ -12,6 +12,10 @@ import java.io.Serializable;
  * Performs LU decomposition of m by n matrix.
  * If isNonsingular() returns false then all linear solver will fail.
  * Created by Mateusz Gasior on 26-Feb-17.
+ *
+ * @author Mateusz Gasior
+ * @see Matrix
+ * @see Vector
  */
 public class LUDecomposition implements Serializable {
 

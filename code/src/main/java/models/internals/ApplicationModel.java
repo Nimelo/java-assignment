@@ -18,6 +18,11 @@ import java.io.*;
  * Model of application.
  * Contains matrix and vector.
  * Created by Mateusz Gasior on 26-Feb-17.
+ *
+ * @author Mateusz Gasior
+ * @see Matrix
+ * @see Vector
+ * @see LUDecomposition
  */
 public class ApplicationModel {
     /**

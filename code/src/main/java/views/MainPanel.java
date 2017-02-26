@@ -14,7 +14,10 @@ import java.awt.*;
 import java.io.IOException;
 
 /**
+ * Main Panel of application.
  * Created by Mateusz Gasior on 23-Feb-17.
+ *
+ * @author Mateusz Gasior
  */
 public class MainPanel {
     /**
