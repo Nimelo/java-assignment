@@ -152,7 +152,7 @@ public final class Matrix implements Serializable {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
-                stringBuilder.append(String.format("%f ", data[i][j]));
+                stringBuilder.append(String.format("\t%10.7f", data[i][j]));
             }
             stringBuilder.append("\n");
         }
@@ -184,7 +184,11 @@ public final class Matrix implements Serializable {
         return X;
     }
 
-
+    /**
+     * Returns copy of elements in matrix.
+     *
+     * @return Copy of elements in matrix.
+     */
     public double[][] getDataCopy() {
         double[][] copy = new double[rows][columns];
 

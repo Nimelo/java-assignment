@@ -1,6 +1,7 @@
 package controllers;
 
 import controllers.exceptions.*;
+import controllers.transformers.TransformationUtils;
 import models.internals.results.InverseResult;
 import models.internals.results.LUPivotResult;
 import models.internals.ApplicationModel;
@@ -10,6 +11,8 @@ import models.matrices.Matrix;
 import models.vectors.Vector;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * Controller of Application.
@@ -64,30 +67,7 @@ public class MainController {
      * @throws MatrixExtractionException                when elements are not real numbers.
      */
     public void extractAndSetMatrix(String matrix) throws NotEqualAmountOfColumnsInMatrixException, MatrixExtractionException {
-        final String rowsSeparator = "\n";
-        final String columnSeparator = " ";
-
-        String[] rows = matrix.split(rowsSeparator);
-        double[][] data = new double[rows.length][rows[0].split(columnSeparator).length];
-
-        for (int i = 0; i < rows.length; i++) {
-            String[] columns = rows[i].split(columnSeparator);
-            if (columns.length != data[0].length) {
-                throw new NotEqualAmountOfColumnsInMatrixException();
-            }
-
-            for (int j = 0; j < columns.length; j++) {
-                try {
-                    data[i][j] = Double.valueOf(columns[j]);
-                } catch (Throwable t) {
-                    throw new MatrixExtractionException();
-                }
-
-            }
-        }
-
-        Matrix newMatrix = new Matrix(data);
-        this.model.setMatrix(newMatrix);
+        this.model.setMatrix(TransformationUtils.transformToMatrix(matrix));
     }
 
     /**
@@ -98,21 +78,7 @@ public class MainController {
      * @throws VectorExtractionException when elements of vector are not real numbers.
      */
     public void extractAndSetVector(String vector) throws VectorExtractionException {
-        final String valuesSeparator = " ";
-
-        String[] values = vector.split(valuesSeparator);
-
-        double[] data = new double[values.length];
-        for (int i = 0; i < values.length; i++) {
-            try {
-                data[i] = Double.valueOf(values[i]);
-            } catch (Throwable throwable) {
-                throw new VectorExtractionException();
-            }
-
-        }
-
-        this.model.setVector(new Vector(data));
+        this.model.setVector(TransformationUtils.transformToVector(vector));
     }
 
     public void serialize(String path) throws IOException {

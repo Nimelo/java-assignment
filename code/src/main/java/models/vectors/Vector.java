@@ -135,7 +135,7 @@ public class Vector implements Serializable{
         StringBuilder stringBuilder = new StringBuilder();
 
         for (int j = 0; j < size; j++) {
-            stringBuilder.append(String.format("%f ", data[j]));
+            stringBuilder.append(String.format("\t%10.7f", data[j]));
         }
         stringBuilder.append("\n");
 

@@ -101,10 +101,10 @@ public class ApplicationModel {
      */
     private void checkLUPivotConstraints() throws LUPivotConstraintsException {
         if (getMatrix() == null || getVector() == null) {
-            throw new LUPivotConstraintsException();
+            throw new LUPivotConstraintsException("Matrix or vector is null.");
         } else {
             if (getVector().getSize() != getMatrix().getColumns()) {
-                throw new LUPivotConstraintsException();
+                throw new LUPivotConstraintsException("Number of columns in vector is incorrect.");
             }
         }
     }

@@ -108,7 +108,7 @@ public class MainPanel {
             } catch (NotEqualAmountOfColumnsInMatrixException e1) {
                 this.statusLabel.setText("Error: Input matrix is not correct. Check number of columns.");
             } catch (LUPivotConstraintsException e1) {
-                this.statusLabel.setText("Error: Input vector or matrix is not correct.");
+                this.statusLabel.setText("Error: " + e1.getMessage());
             } catch (SingularMatrixException e1) {
                 this.statusLabel.setText("Error: Input matrix is singular.");
             } catch (InvalidMatrixSizesException e1) {
