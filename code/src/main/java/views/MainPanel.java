@@ -71,7 +71,7 @@ public class MainPanel {
     private JButton loadButton;
 
     /**
-     *
+     * Controller of the view.
      */
     private MainController controller;
 
