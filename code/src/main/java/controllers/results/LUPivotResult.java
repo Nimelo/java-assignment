@@ -59,6 +59,7 @@ public class LUPivotResult {
 
     /**
      * Overridden toString routine.
+     *
      * @return String with specific format.
      */
     @Override

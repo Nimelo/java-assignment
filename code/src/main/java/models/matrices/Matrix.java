@@ -1,10 +1,6 @@
 package models.matrices;
 
-import models.exceptions.InvalidMatrixSizeForMultiplication;
-import models.exceptions.MatrixVectorMultiplicationSizeException;
 import models.vectors.Vector;
-
-import java.util.Arrays;
 
 /**
  * A matrix class for data storage od a 2D array of doubles.
@@ -136,88 +132,12 @@ public final class Matrix {
     }
 
     /**
-     * Gives product of multiplication of two matrices
-     *
-     * @param a Matrix from the right hand-side.
-     * @return Result of multiplication.
-     * @throws InvalidMatrixSizeForMultiplication when matrices have different size
-     */
-    public Matrix multiply(final Matrix a) throws InvalidMatrixSizeForMultiplication {
-        int nRows = getRows();
-        int nCols = getColumns();
-
-        if (a.getRows() != nRows
-                || a.getColumns() != nCols)
-            throw new InvalidMatrixSizeForMultiplication();
-
-        Matrix multiplication = new Matrix(nRows, nCols);
-
-        for (int i = 0; i < getRows(); i++) {
-            for (int j = 0; j < a.getColumns(); j++) {
-                for (int k = 0; k < getColumns(); k++) {
-                    multiplication.setAt(i, j, multiplication.getAt(i, j) + this.getAt(i, k) * a.getAt(k, j));
-                }
-            }
-        }
-
-        return multiplication;
-    }
-
-    /**
-     * Calculates determinant of the matrix
-     *
-     * @return Determinant of matrix
-     */
-    public double determinant() throws Exception {
-        throw new Exception();
-    }
-
-    /**
-     * Transposing matrix routine
-     *
-     * @return
-     */
-    public Matrix transpose() {
-        Matrix transpose = new Matrix(columns, rows);
-        for (int i = 0; i < columns; i++) {
-            for (int j = 0; j < rows; j++) {
-                transpose.data[i][j] = this.data[j][i];
-            }
-        }
-
-        return transpose;
-    }
-
-    /**
      * Returns data matrix
      *
      * @return elements of matrix
      */
     public double[][] getData() {
         return data;
-    }
-
-    /**
-     * Multiplies Matrix by a Vector.
-     *
-     * @param vector Right hand-side vector
-     * @return Product of Matrix-Vector multiplication - Vector
-     * @throws MatrixVectorMultiplicationSizeException when size of the vector is not equal to number of columns in a matrix
-     */
-    public Vector multiply(Vector vector) throws MatrixVectorMultiplicationSizeException {
-        int nRows = getRows();
-        int nCols = getColumns();
-
-        if (nCols != vector.getSize())
-            throw new MatrixVectorMultiplicationSizeException();
-
-        Vector res = new Vector(nRows);
-
-        for (int i = 0; i < nRows; i++)
-            for (int j = 0; j < nCols; j++)
-                res.getData()[i] += this.getData()[i][j] * vector.getData()[j];
-
-        return res;
     }
 
     /**
@@ -236,5 +156,59 @@ public final class Matrix {
         }
 
         return stringBuilder.toString();
+    }
+
+    /**
+     * Returns a sub-matrix for given parameters.
+     *
+     * @param r                  Array of row indices.
+     * @param initialColumnIndex Initial column index
+     * @param finalColumnIndex   Final column index
+     * @return A(r(:), j0:finalColumnIndex)
+     * @throws ArrayIndexOutOfBoundsException Submatrix indices
+     */
+    public Matrix getMatrix(int[] r, int initialColumnIndex, int finalColumnIndex) {
+        Matrix X = new Matrix(r.length, finalColumnIndex - initialColumnIndex + 1);
+        double[][] B = X.getData();
+        try {
+            for (int i = 0; i < r.length; i++) {
+                for (int j = initialColumnIndex; j <= finalColumnIndex; j++) {
+                    B[i][j - initialColumnIndex] = data[r[i]][j];
+                }
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new ArrayIndexOutOfBoundsException("Submatrix indices");
+        }
+        return X;
+    }
+
+
+    public double[][] getDataCopy() {
+        double[][] copy = new double[rows][columns];
+
+        for (int i = 0; i < rows; i++)
+            for (int j = 0; j < columns; j++)
+                copy[i][j] = data[i][j];
+
+        return copy;
+    }
+
+
+    /**
+     * Generates identity matrix.
+     *
+     * @param m Number of rows.
+     * @param n Number of columns.
+     * @return An m-by-n matrix with ones on the diagonal and zeros elsewhere.
+     */
+    public static Matrix identity(int m, int n) {
+        Matrix A = new Matrix(m, n);
+        double[][] X = A.getData();
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                X[i][j] = (i == j ? 1.0 : 0.0);
+            }
+        }
+        return A;
     }
 }

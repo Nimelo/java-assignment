@@ -66,7 +66,7 @@ public class MainPanel {
     private JButton loadButton;
 
     /**
-     * Main controller.
+     *
      */
     private MainController controller;
 
@@ -109,7 +109,6 @@ public class MainPanel {
      * Creates GUI and displays it to screen.
      */
     private static void createAndShowGUI() {
-        //Create and set up the window.
         JFrame frame = new JFrame("Assignment Advanced Java, Mateusz Gasior, s258770");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();

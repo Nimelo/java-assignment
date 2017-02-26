@@ -7,14 +7,8 @@ import controllers.results.InverseResult;
 import controllers.results.LUPivotResult;
 import models.exceptions.*;
 import models.matrices.Matrix;
-import models.utilities.DeterminantUtilities;
-import models.utilities.LUMatricesUtilities;
-import models.utilities.objects.LUMatrixTuple;
-import models.utilities.objects.PivotingResult;
+import models.utilities.LUDecomposition;
 import models.vectors.Vector;
-
-import static models.utilities.InverseMatrixUtilities.findInverseOfLowerTriangularMatrix;
-import static models.utilities.InverseMatrixUtilities.findInverseOfUpperTriangularMatrix;
 
 /**
  * Controller of Application.
@@ -35,19 +29,17 @@ public class MainController {
      * Routine that calculates solution of problem Ax = b
      *
      * @return Result of LU Pivot routine.
-     * @throws NonSquareMatrixException                when matrix does not have a square shape.
-     * @throws ZeroPivotException                      when zero occurs in pivot.
-     * @throws InvalidMatrixSizeForMultiplication      when there will be invalid size of matrices during multiplication.
-     * @throws InvalidMatrixSizesException             when matrices during calculations will have different sizes.
-     * @throws LUPivotConstraintsException             when requirements for performing LU pivoting will not be meet.
-     * @throws MatrixVectorMultiplicationSizeException when size of vector and size of matrix are not correct for multiplication.
+     * @throws NonSquareMatrixException    when matrix does not have a square shape.
+     * @throws InvalidMatrixSizesException when matrices during calculations will have different sizes.
+     * @throws LUPivotConstraintsException when requirements for performing LU pivoting will not be meet.
+     * @throws SingularMatrixException     when matrix is singular.
      */
-    public LUPivotResult LUPivot() throws NonSquareMatrixException, ZeroPivotException, InvalidMatrixSizeForMultiplication, InvalidMatrixSizesException, LUPivotConstraintsException, MatrixVectorMultiplicationSizeException {
+    public LUPivotResult LUPivot() throws NonSquareMatrixException, InvalidMatrixSizesException, LUPivotConstraintsException, SingularMatrixException {
         checkLUPivotConstraints();
-        PivotingResult reorder = LUMatricesUtilities.reorder(matrix);
-        LUMatrixTuple factorize = LUMatricesUtilities.factorize(reorder.getMatrix().multiply(matrix));
-        Vector solution = LUMatricesUtilities.solve(factorize.getL(), factorize.getU(), reorder.getMatrix().multiply(vector));
-        double determinant = DeterminantUtilities.computeDeterminant(factorize.getL(), factorize.getU(), reorder.getNumberOfRowExchanges());
+
+        LUDecomposition factorize = new LUDecomposition(matrix);
+        Vector solution = factorize.solve(vector);
+        double determinant = factorize.det();
 
         return new LUPivotResult(matrix, vector, factorize.getL(), factorize.getU(), solution, determinant);
     }
@@ -92,19 +84,14 @@ public class MainController {
         Matrix u = null;
 
         try {
-            PivotingResult reorder = LUMatricesUtilities.reorder(matrix);
-            Matrix p = reorder.getMatrix();
-            LUMatrixTuple luTuple = LUMatricesUtilities.factorize(p.multiply(matrix));
+            LUDecomposition luDecomposition = new LUDecomposition(matrix);
 
-            l = luTuple.getL();
-            u = luTuple.getU();
+            l = luDecomposition.getL();
+            u = luDecomposition.getU();
 
-            Matrix inverseL = findInverseOfLowerTriangularMatrix(luTuple.getL());
-            Matrix inverseU = findInverseOfUpperTriangularMatrix(luTuple.getU());
+            inverse = luDecomposition.inverse();
 
-            inverse = inverseU.multiply(inverseL).multiply(p);
-
-            determinant = DeterminantUtilities.computeDeterminant(l, u, reorder.getNumberOfRowExchanges());
+            determinant = luDecomposition.det();
         } catch (Throwable e) {
 
         } finally {

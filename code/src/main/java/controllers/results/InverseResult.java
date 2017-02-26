@@ -51,12 +51,12 @@ public class InverseResult {
 
     /**
      * Overridden toString routine.
+     *
      * @return String in specific format.
      */
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-
 
         stringBuilder.append("Matrix Inversion\n")
                 .append("Original Matrix\n").append(originalMatrix.toString());
