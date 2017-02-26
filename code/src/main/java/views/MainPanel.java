@@ -162,14 +162,15 @@ public class MainPanel {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-        MainPanel something = new MainPanel();
-        frame.add(something.mainPanel);
+        MainPanel mainPanel = new MainPanel();
+        frame.add(mainPanel.mainPanel);
 
         frame.pack();
         frame.setVisible(true);
         int width = (int) (0.7 * screenSize.getWidth());
         int height = (int) (0.7 * screenSize.getHeight());
         frame.setSize(new Dimension(width, height));
+        frame.setMinimumSize(new Dimension(400, 400));
     }
 
     /**
