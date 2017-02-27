@@ -176,7 +176,7 @@ public class ApplicationModel {
 
     /**
      * Deserialize result from the file.
-     * Sets last result to last object.
+     * Sets last result with deserialized object
      * Sets matrix, vector and LU decomposition objects.
      *
      * @param path Path to the file.
@@ -190,12 +190,13 @@ public class ApplicationModel {
         this.lastResult = (Result) in.readObject();
         in.close();
         fileIn.close();
-
-        this.matrix = lastResult.getOriginalMatrix();
-        if (lastResult instanceof LUPivotResult) {
-            this.vector = ((LUPivotResult) lastResult).getOriginalVector();
+        if(lastResult != null){
+            this.matrix = lastResult.getOriginalMatrix();
+            if (lastResult instanceof LUPivotResult) {
+                this.vector = ((LUPivotResult) lastResult).getOriginalVector();
+            }
+            this.luDecomposition = lastResult.getLuDecomposition();
         }
-        this.luDecomposition = lastResult.getLuDecomposition();
 
         return this.lastResult;
     }

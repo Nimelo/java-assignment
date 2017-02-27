@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="com.intellij:forms_rt:6.0.5" type="repository">
+    <properties maven-id="com.intellij:forms_rt:6.0.5" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/intellij/forms_rt/6.0.5/forms_rt-6.0.5.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/asm/asm-commons/2.2.3/asm-commons-2.2.3.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/asm/asm-tree/2.2.3/asm-tree-2.2.3.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/asm/asm/2.2.3/asm-2.2.3.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/jgoodies/forms/1.0.7/forms-1.0.7.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/jdom/jdom/1.0/jdom-1.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
