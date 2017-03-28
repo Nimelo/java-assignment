@@ -132,7 +132,7 @@ public class MainPanel {
                     Result deserialize = controller.deserialize(s);
                     if(deserialize != null)
                     {
-                        this.outputArea.setText(deserialize.toString());
+                        this.outputArea.setText(deserialize.toString()+"\n\n");
                         this.matrixArea.setText(deserialize.getOriginalMatrix().toString());
                         if (deserialize instanceof LUPivotResult) {
                             this.vectorArea.setText(((LUPivotResult) deserialize).getOriginalVector().toString());
