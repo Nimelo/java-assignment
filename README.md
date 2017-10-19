@@ -11,4 +11,4 @@ List of features is as follows:
  
 ### Who do I talk to? ###
 
-Mateusz Gasior [mateusz.p.gasior@cranfield.ac.uk](mateusz.p.gasior@cranfield.ac.uk)
+Mateusz Gasior mr.nimelo@gmail.com
